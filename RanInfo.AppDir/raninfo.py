@@ -27,6 +27,9 @@ def generate_name():
 def generate_password(length=12):
     return ''.join(random.choice(chars) for _ in range(length))
 
+def print_header():
+    print("\033[92mℝ𝕒𝕟𝕀𝕟𝕗𝕠 𝕧𝟙\033[0m")  # Green header
+
 def main():
     parser = argparse.ArgumentParser(description="Fake Name & Password Generator")
     parser.add_argument('--name', action='store_true', help="Generate a fake name")
@@ -35,13 +38,19 @@ def main():
 
     args = parser.parse_args()
 
+    if args.name or args.passwd or not (args.name or args.passwd):
+        print_header()  # Print green header every time something is generated
+
     if args.name:
         print("Name:", generate_name())
     if args.passwd:
         print("Password:", generate_password(args.length))
+        print("\033[91m/If you lose this info it is gone forever/\033[0m")  # Red warning
     if not (args.name or args.passwd):
+        # Both name & password
         print("Name:", generate_name())
         print("Password:", generate_password(args.length))
+        print("\033[91m/If you lose this info it is gone forever/\033[0m")  # Red warning
 
 if __name__ == "__main__":
     main()
