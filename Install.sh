@@ -1,31 +1,23 @@
 #!/usr/bin/env bash
 
-echo "Installing RanInfo..."
+# Create directory
+mkdir -p ~/RanInfo
 
-# create install directory
-mkdir -p "$HOME/RanInfo"
+# Navigate into it
+cd ~/RanInfo || exit
 
-# go into it
-cd "$HOME/RanInfo"
+# Download the latest raninfo.py from GitHub
+curl -LO https://raw.githubusercontent.com/SebPng/RanInfo/main/raninfo.py
 
-# download latest raninfo script
-curl -L https://raw.githubusercontent.com/SebPng/RanInfo/main/raninfo.py -o raninfo
+# Make it executable
+chmod +x raninfo.py
 
-# make executable
-chmod +x raninfo
-
-# add to PATH if not already there
-if ! grep -q 'RanInfo' "$HOME/.bashrc"; then
-    echo 'export PATH="$HOME/RanInfo:$PATH"' >> "$HOME/.bashrc"
+# Add to PATH if not already
+PROFILE_FILE="$HOME/.bashrc"
+if ! grep -q 'export PATH="$HOME/RanInfo:$PATH"' "$PROFILE_FILE"; then
+    echo 'export PATH="$HOME/RanInfo:$PATH"' >> "$PROFILE_FILE"
+    echo "Added ~/RanInfo to PATH in $PROFILE_FILE"
 fi
 
-echo ""
-echo "RanInfo installed in ~/RanInfo"
-echo "Restart terminal or run:"
-echo "source ~/.bashrc"
-echo ""
-echo "Then you can use:"
-echo "raninfo --name"
-echo "raninfo --pass"
-echo "raninfo --pass --length 20"
-echo "raninfo -h/--help
+echo "Installation complete! You may need to restart your terminal or run 'source ~/.bashrc'."
+echo "You can now run the command 'raninfo.py --help'"
