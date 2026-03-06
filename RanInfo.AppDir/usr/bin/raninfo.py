@@ -25,9 +25,10 @@ last_names = [
 chars = string.ascii_letters + string.digits + "!@#$%^&*"
 
 CHANGELOG = [
-    "v1.0 - Initial release with name & password generator",
-    "v1.0.1 - Added multi generation & email support",
-    "v1.1 - Added password strength meter and --help",
+    "v1.0 - Release with name & password generator",
+    "v1.0.1 - Added a warning when generating passwords",
+    "v1.1 - Added help menu"
+    "v2.0 - Added Fake mail generator, number of names and passwords to generate, password strength checker and this very menu.",
 ]
 
 def generate_name():
