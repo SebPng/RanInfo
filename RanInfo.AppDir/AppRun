@@ -1,3 +1,5 @@
 #!/bin/bash
+# AppRun launcher for RanInfo
 HERE="$(dirname "$(readlink -f "${0}")")"
-"$HERE/usr/bin/python3" "$HERE/raninfo.py" "$@"
+export PYTHONPATH="$HERE/usr/bin"
+exec "$HERE/usr/bin/python3" "$HERE/usr/bin/raninfo.py" "$@"
