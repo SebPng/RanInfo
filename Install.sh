@@ -1,20 +1,30 @@
-#!/bin/bash
-# RanInfo Install Script
-# Downloads all necessary files from GitHub
+#!/usr/bin/env bash
 
-# URLs to your files on GitHub Releases
-BASE_URL="https://github.com/SebPng/RanInfo/releases/download/v1.0.1"
+echo "Installing RanInfo..."
 
-FILES=("raninfo.py" "raninfo.png" "raninfo.desktop" "LICENSE" "README.md")
+# create install directory
+mkdir -p "$HOME/RanInfo"
 
-echo "Downloading RanInfo files..."
+# go into it
+cd "$HOME/RanInfo"
 
-for file in "${FILES[@]}"; do
-    echo "Downloading $file..."
-    curl -L -o "$file" "$BASE_URL/$file" || { echo "Failed to download $file"; exit 1; }
-done
+# download latest raninfo script
+curl -L https://raw.githubusercontent.com/SebPng/RanInfo/main/raninfo.py -o raninfo
 
-chmod +x raninfo.py
+# make executable
+chmod +x raninfo
 
-echo "All files downloaded and raninfo.py is executable!"
-echo "You can now run RanInfo using: ./raninfo.py"
+# add to PATH if not already there
+if ! grep -q 'RanInfo' "$HOME/.bashrc"; then
+    echo 'export PATH="$HOME/RanInfo:$PATH"' >> "$HOME/.bashrc"
+fi
+
+echo ""
+echo "RanInfo installed in ~/RanInfo"
+echo "Restart terminal or run:"
+echo "source ~/.bashrc"
+echo ""
+echo "Then you can use:"
+echo "raninfo --name"
+echo "raninfo --pass"
+echo "raninfo --pass --length 20"
