@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-# ℝ𝕒𝕟𝕀𝕟𝕗𝕠 𝕧1  (green header will print)
+# 💚 ℝ𝕒𝕟𝕀𝕟𝕗𝕠 𝕧1 💚
 
 import random
 import string
 import argparse
+import sys
 
-# Print green header
-print("\033[92mℝ𝕒𝕟𝕀𝕟𝕗𝕠 𝕧1\033[0m\n")
+# Warning when generating sensitive info
+WARNING_MSG = "\033[91m/If you lose this info it is gone forever/\033[0m"
 
 first_names = [
     "Alex", "Sam", "Jamie", "Taylor", "Jordan", "Morgan", "Casey", "Riley", "Cameron", "Avery",
@@ -30,33 +31,51 @@ def generate_name():
     return f"{random.choice(first_names)} {random.choice(last_names)}"
 
 def generate_password(length=12):
-    pwd = ''.join(random.choice(chars) for _ in range(length))
-    return pwd
+    return ''.join(random.choice(chars) for _ in range(length))
+
+def print_help():
+    help_text = f"""
+💚 ℝ𝕒𝕟𝕀𝕟𝕗𝕠 𝕧1 💚
+
+Usage: raninfo [OPTIONS]
+
+Options:
+  --name            Generate a fake name
+  --pass            Generate a random password
+  --length [NUM]    Specify password length (default 12)
+  --help            Show this help message
+
+Examples:
+  raninfo --name                  # Generates only a fake name
+  raninfo --pass                  # Generates only a password of default length
+  raninfo --pass --length 20      # Generates password of length 20
+  raninfo --name --pass --length 16   # Generates both name and password
+"""
+    print(help_text)
 
 def main():
-    parser = argparse.ArgumentParser(description="Fake Name & Password Generator")
+    parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--name', action='store_true', help="Generate a fake name")
     parser.add_argument('--pass', dest='passwd', action='store_true', help="Generate a random password")
     parser.add_argument('--length', type=int, default=12, help="Password length (default 12)")
+    parser.add_argument('--help', action='store_true', help="Show help message")
 
     args = parser.parse_args()
 
-    printed_something = False
+    if args.help:
+        print_help()
+        sys.exit(0)
 
     if args.name:
         print("Name:", generate_name())
-        printed_something = True
-
     if args.passwd:
-        pwd = generate_password(args.length)
-        print("\033[91mPassword:", pwd, "/If you lose this info it is gone forever/\033[0m")
-        printed_something = True
-
-    if not printed_something:
-        # Generate both by default
+        print("Password:", generate_password(args.length))
+        print(WARNING_MSG)
+    if not (args.name or args.passwd or args.help):
+        # Default behavior: generate both
         print("Name:", generate_name())
-        pwd = generate_password(args.length)
-        print("\033[91mPassword:", pwd, "/If you lose this info it is gone forever/\033[0m")
+        print("Password:", generate_password(args.length))
+        print(WARNING_MSG)
 
 if __name__ == "__main__":
     main()
