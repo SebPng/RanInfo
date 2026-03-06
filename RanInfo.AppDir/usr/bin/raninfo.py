@@ -2,18 +2,16 @@
 import random
 import string
 import argparse
-import sys
+import re
 
-# 🟢 HEADER
-print("\033[1;32mℝ𝕒𝕟𝕀𝕟𝕗𝕠 v1.1\033[0m\n")
+HEADER = "\033[92mℝ𝕒𝕟𝕀𝕟𝕗𝕠 𝕧𝟙\033[0m"
 
-# --- Name and Password Data ---
 first_names = [
     "Alex", "Sam", "Jamie", "Taylor", "Jordan", "Morgan", "Casey", "Riley", "Cameron", "Avery",
     "Quinn", "Reese", "Dakota", "Emerson", "Parker", "Harper", "Skyler", "Rowan", "Sawyer", "Finley",
-    "Blake", "Elliot", "Charlie", "Hayden", "Sage", "Kendall", "Payton", "Alexis", "Logan", "Sydney",
-    "Carter", "Hunter", "Jesse", "Adrian", "Taylor", "Lane", "Phoenix", "Jordan", "River", "Morgan",
-    "Tatum", "Kai", "Shawn", "Reagan", "Casey", "Drew", "Peyton", "Bailey", "Emery", "Micah"
+    "Blake", "Elliot", "Charlie", "Hayden", "Sage", "Kendall", "Payton", "Alexis", "Logan", "Dakota",
+    "Sydney", "Carter", "Hunter", "Jesse", "Adrian", "Taylor", "Lane", "Phoenix", "Jordan", "River",
+    "Morgan", "Tatum", "Kai", "Shawn", "Reagan", "Casey", "Drew", "Peyton", "Bailey", "Emery"
 ]
 
 last_names = [
@@ -26,95 +24,72 @@ last_names = [
 
 chars = string.ascii_letters + string.digits + "!@#$%^&*"
 
-# --- Changelog ---
-changelog_text = """
-v1.1 - New Features:
-- --changelog command
-- Automatic PATH setup instructions
-- Generate multiple names/passwords/emails with --count
-- Password strength meter
-- Random email generator ending with @fgm.fk
-"""
+CHANGELOG = [
+    "v1.0 - Initial release with name & password generator",
+    "v1.0.1 - Added multi generation & email support",
+    "v1.1 - Added password strength meter and --help",
+]
 
-# --- Functions ---
 def generate_name():
     return f"{random.choice(first_names)} {random.choice(last_names)}"
 
 def generate_password(length=12):
-    pwd = ''.join(random.choice(chars) for _ in range(length))
-    strength = password_strength(pwd)
-    return pwd, strength
+    return ''.join(random.choice(chars) for _ in range(length))
 
-def password_strength(pwd):
-    score = 0
-    if any(c.islower() for c in pwd):
-        score += 1
-    if any(c.isupper() for c in pwd):
-        score += 1
-    if any(c.isdigit() for c in pwd):
-        score += 1
-    if any(c in "!@#$%^&*" for c in pwd):
-        score += 1
-    if len(pwd) >= 12:
-        score += 1
-    if score <= 2:
-        return "Weak"
-    elif score <= 4:
-        return "Medium"
-    else:
-        return "Strong"
-
-def generate_email(name):
-    username = name.lower().replace(" ", ".")
+def generate_email():
+    username = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
     return f"{username}@fgm.fk"
 
-def print_help():
-    help_text = """
-Usage: raninfo [OPTIONS]
+def password_strength(password):
+    length = len(password)
+    upper = re.search(r'[A-Z]', password) is not None
+    lower = re.search(r'[a-z]', password) is not None
+    digit = re.search(r'\d', password) is not None
+    symbol = re.search(r'[!@#$%^&*]', password) is not None
+    score = sum([length>=8, upper, lower, digit, symbol])
+    if score <= 2:
+        return "Weak"
+    elif score == 3:
+        return "Medium"
+    elif score == 4:
+        return "Strong"
+    else:
+        return "Very Strong"
 
-Options:
-  --name            Generate a fake name
-  --pass            Generate a random password
-  --email           Generate a random email
-  --length N        Password length (default 12)
-  --count N         Generate multiple names/passwords/emails
-  --changelog       Show version history
-  --help            Show this help message
-"""
-    print(help_text)
-
-# --- Main ---
 def main():
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument('--name', action='store_true')
-    parser.add_argument('--pass', dest='passwd', action='store_true')
-    parser.add_argument('--email', action='store_true')
-    parser.add_argument('--length', type=int, default=12)
-    parser.add_argument('--count', type=int, default=1)
-    parser.add_argument('--changelog', action='store_true')
-    parser.add_argument('--help', action='store_true')
+    print(HEADER)
+    parser = argparse.ArgumentParser(description="ℝ𝕒𝕟𝕀𝕟𝕗𝕠 - Fake Name & Password Tool")
+    parser.add_argument('--name', action='store_true', help="Generate a fake name")
+    parser.add_argument('--pass', dest='passwd', action='store_true', help="Generate a random password")
+    parser.add_argument('--length', type=int, default=12, help="Password length (default 12)")
+    parser.add_argument('--email', action='store_true', help="Generate a random email ending with @fgm.fk")
+    parser.add_argument('--strength', type=str, help="Check password strength")
+    parser.add_argument('--multi', type=int, default=1, help="Generate multiple entries")
+    parser.add_argument('--changelog', '-c', action='store_true', help="Show the change log")
+
     args = parser.parse_args()
 
-    if args.help:
-        print_help()
-        sys.exit(0)
-
     if args.changelog:
-        print(changelog_text)
-        sys.exit(0)
+        print("Change Log:")
+        for line in CHANGELOG:
+            print("-", line)
+        return
 
-    for _ in range(args.count):
-        if args.name or not (args.passwd or args.email):
-            name = generate_name()
-            print("Name:", name)
-        if args.passwd or not (args.name or args.email):
-            pwd, strength = generate_password(args.length)
-            print(f"Password: {pwd} ({strength})")
-            print("\033[1;31m/If you lose this info it is gone forever/\033[0m")
-        if args.email or not (args.name or args.passwd):
-            email = generate_email(name)
-            print("Email:", email)
-        print("")
+    for _ in range(args.multi):
+        if args.strength:
+            print("Password Strength:", password_strength(args.strength))
+        else:
+            if args.name:
+                print("Name:", generate_name())
+            if args.passwd:
+                print("Password:", generate_password(args.length))
+                print("\033[91m/If you lose this info it is gone forever/\033[0m")
+            if args.email:
+                print("Email:", generate_email())
+            if not (args.name or args.passwd or args.email):
+                print("Name:", generate_name())
+                print("Password:", generate_password(args.length))
+                print("\033[91m/If you lose this info it is gone forever/\033[0m")
 
 if __name__ == "__main__":
     main()
