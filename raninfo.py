@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
-# 💚 ℝ𝕒𝕟𝕀𝕟𝕗𝕠 𝕧1 💚
-
 import random
 import string
 import argparse
-import sys
+import re
 
-# Warning when generating sensitive info
-WARNING_MSG = "\033[91m/If you lose this info it is gone forever/\033[0m"
+HEADER = "\033[92mℝ𝕒𝕟𝕀𝕟𝕗𝕠 𝕧𝟙\033[0m"
 
 first_names = [
     "Alex", "Sam", "Jamie", "Taylor", "Jordan", "Morgan", "Casey", "Riley", "Cameron", "Avery",
@@ -27,55 +24,72 @@ last_names = [
 
 chars = string.ascii_letters + string.digits + "!@#$%^&*"
 
+CHANGELOG = [
+    "v1.0 - Initial release with name & password generator",
+    "v1.0.1 - Added multi generation & email support",
+    "v1.1 - Added password strength meter and --help",
+]
+
 def generate_name():
     return f"{random.choice(first_names)} {random.choice(last_names)}"
 
 def generate_password(length=12):
     return ''.join(random.choice(chars) for _ in range(length))
 
-def print_help():
-    help_text = f"""
-💚 ℝ𝕒𝕟𝕀𝕟𝕗𝕠 𝕧1 💚
+def generate_email():
+    username = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
+    return f"{username}@fgm.fk"
 
-Usage: raninfo [OPTIONS]
-
-Options:
-  --name            Generate a fake name
-  --pass            Generate a random password
-  --length [NUM]    Specify password length (default 12)
-  --help            Show this help message
-
-Examples:
-  raninfo --name                  # Generates only a fake name
-  raninfo --pass                  # Generates only a password of default length
-  raninfo --pass --length 20      # Generates password of length 20
-  raninfo --name --pass --length 16   # Generates both name and password
-"""
-    print(help_text)
+def password_strength(password):
+    length = len(password)
+    upper = re.search(r'[A-Z]', password) is not None
+    lower = re.search(r'[a-z]', password) is not None
+    digit = re.search(r'\d', password) is not None
+    symbol = re.search(r'[!@#$%^&*]', password) is not None
+    score = sum([length>=8, upper, lower, digit, symbol])
+    if score <= 2:
+        return "Weak"
+    elif score == 3:
+        return "Medium"
+    elif score == 4:
+        return "Strong"
+    else:
+        return "Very Strong"
 
 def main():
-    parser = argparse.ArgumentParser(add_help=False)
+    print(HEADER)
+    parser = argparse.ArgumentParser(description="ℝ𝕒𝕟𝕀𝕟𝕗𝕠 - Fake Name & Password Tool")
     parser.add_argument('--name', action='store_true', help="Generate a fake name")
     parser.add_argument('--pass', dest='passwd', action='store_true', help="Generate a random password")
     parser.add_argument('--length', type=int, default=12, help="Password length (default 12)")
-    parser.add_argument('--help', action='store_true', help="Show help message")
+    parser.add_argument('--email', action='store_true', help="Generate a random email ending with @fgm.fk")
+    parser.add_argument('--strength', type=str, help="Check password strength")
+    parser.add_argument('--multi', type=int, default=1, help="Generate multiple entries")
+    parser.add_argument('--changelog', '-c', action='store_true', help="Show the change log")
 
     args = parser.parse_args()
 
-    if args.help:
-        print_help()
-        sys.exit(0)
+    if args.changelog:
+        print("Change Log:")
+        for line in CHANGELOG:
+            print("-", line)
+        return
 
-    if args.name:
-        print("Name:", generate_name())
-    if args.passwd:
-        print("Password:", generate_password(args.length))
-        print(WARNING_MSG)
-    if not (args.name or args.passwd or args.help):
-        # Default behavior: generate both
-        print("Name:", generate_name())
-        print("Password:", generate_password(args.length))
-        print(WARNING_MSG)
+    for _ in range(args.multi):
+        if args.strength:
+            print("Password Strength:", password_strength(args.strength))
+        else:
+            if args.name:
+                print("Name:", generate_name())
+            if args.passwd:
+                print("Password:", generate_password(args.length))
+                print("\033[91m/If you lose this info it is gone forever/\033[0m")
+            if args.email:
+                print("Email:", generate_email())
+            if not (args.name or args.passwd or args.email):
+                print("Name:", generate_name())
+                print("Password:", generate_password(args.length))
+                print("\033[91m/If you lose this info it is gone forever/\033[0m")
 
 if __name__ == "__main__":
     main()
