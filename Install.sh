@@ -28,3 +28,4 @@ echo "Then you can use:"
 echo "raninfo --name"
 echo "raninfo --pass"
 echo "raninfo --pass --length 20"
+echo "raninfo -h/--help
