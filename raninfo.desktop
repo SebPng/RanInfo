@@ -1,1 +1,7 @@
-Not Found
+[Desktop Entry]
+Name=RanInfo
+Exec=raninfo.py
+Icon=raninfo
+Type=Application
+Categories=Utility;
+Terminal=true
